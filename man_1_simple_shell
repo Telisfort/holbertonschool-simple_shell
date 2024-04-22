@@ -27,6 +27,4 @@ Le shell peut être utilisé en mode interactif ou non interactif. Le mode inter
 \recho "ls -l" | ./hsh
 
 .SH AUTEURS
-Charline Mosquera @CharCoder
-.TP
-\rFelipe Villamizar @felipevcc
+.Diarra & Evrade & ibrahim
