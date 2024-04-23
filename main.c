@@ -6,6 +6,8 @@
 
 #define MAX_TOKENS 10  /* Nombre maximum de tokens */
 
+extern char **environ; /* Assurez-vous de déclarer l'utilisation d'environ */
+
 /**
  * main - Boucle principale du shell
  *
@@ -20,6 +22,11 @@ int main(void)
     size_t len = 0; /* Taille de la ligne */
     ssize_t nread; /* Nombre de caractères lus */
     char *prompt = "simple_shell$ "; /* Prompt du shell */
+    char *tokens[MAX_TOKENS]; /* Tableau de tokens */
+    char *token; /* Pour utiliser strtok */
+    int token_count; /* Compteur de tokens */
+    char **env; /* Pour les variables d'environnement */
+    pid_t pid; /* Pour la création de processus */
 
     while (1) /* Boucle principale */
     {
@@ -37,15 +44,12 @@ int main(void)
             line[nread - 1] = '\0';
         }
 
-        char *tokens[MAX_TOKENS]; /* Stocker les parties de la commande */
-        int token_count = 0; /* Compteur de tokens */
-
-        /* Découper la ligne en parties (tokens) */
-        char *token = strtok(line, " ");
+        token_count = 0; /* Initialiser le compteur de tokens */
+        token = strtok(line, " "); /* Premier token */
         while (token != NULL && token_count < MAX_TOKENS)
         {
             tokens[token_count++] = token; /* Ajouter le token */
-            token = strtok(NULL, " ");
+            token = strtok(NULL, " "); /* Token suivant */
         }
 
         tokens[token_count] = NULL; /* Marquer la fin des tokens */
@@ -64,7 +68,6 @@ int main(void)
         /* Vérifier la commande "env" */
         if (strcmp(tokens[0], "env") == 0)
         {
-            char **env; /* Pointeur sur les variables d'environnement */
             for (env = environ; *env != NULL; env++)
             {
                 printf("%s\n", *env); /* Afficher chaque variable */
@@ -73,7 +76,7 @@ int main(void)
         }
 
         /* Si ce n'est pas "exit" ou "env", exécuter la commande */
-        pid_t pid = fork(); /* Créer un processus enfant */
+        pid = fork(); /* Créer un processus enfant */
 
         if (pid == -1) /* Erreur de fork */
         {
@@ -98,4 +101,3 @@ int main(void)
     /* Terminer le programme */
     return 0;
 }
-
