@@ -1,0 +1,45 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+
+#define BUFFER_SIZE 1024
+
+int main(void) {
+    char buffer[BUFFER_SIZE];
+    char *args[BUFFER_SIZE / 2 + 1];
+    int should_run = 1;
+
+    while (should_run) {
+        printf("$ ");
+        fflush(stdout);
+
+        fgets(buffer, BUFFER_SIZE, stdin);
+        buffer[strcspn(buffer, "\n")] = '\0'; // remove trailing newline
+
+        if (strcmp(buffer, "exit") == 0) {
+            should_run = 0;
+            continue;
+        }
+
+        pid_t pid = fork();
+
+        if (pid < 0) {
+            perror("fork");
+            exit(EXIT_FAILURE);
+        } else if (pid == 0) {
+            // Child process
+            args[0] = buffer;
+            args[1] = NULL;
+            execvp(args[0], args);
+            perror("execvp");
+            exit(EXIT_FAILURE);
+        } else {
+            // Parent process
+            wait(NULL);
+        }
+    }
+
+    return EXIT_SUCCESS;
+}
+
